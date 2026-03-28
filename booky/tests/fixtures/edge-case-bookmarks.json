@@ -1,0 +1,66 @@
+[
+  {
+    "id": "0",
+    "title": "",
+    "children": [
+      {
+        "id": "1",
+        "title": "Bookmarks Bar",
+        "children": [
+          {
+            "id": "10",
+            "title": "Level 1",
+            "children": [
+              {
+                "id": "100",
+                "title": "Level 2",
+                "children": [
+                  {
+                    "id": "1000",
+                    "title": "Level 3",
+                    "children": [
+                      {
+                        "id": "10000",
+                        "title": "Level 4",
+                        "children": [
+                          {
+                            "id": "100000",
+                            "title": "Level 5",
+                            "children": [
+                              {
+                                "id": "1000000",
+                                "title": "Level 6",
+                                "children": [
+                                  {
+                                    "id": "10000000",
+                                    "title": "Level 7",
+                                    "children": [
+                                      { "id": "100000000", "title": "Deep Bookmark", "url": "https://deep.example.com" }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          { "id": "11", "title": "中文标题", "url": "https://chinese.example.com" },
+          { "id": "12", "title": "العربية", "url": "https://arabic.example.com" },
+          { "id": "13", "title": "Ελληνικά", "url": "https://greek.example.com" },
+          { "id": "14", "title": "עברית", "url": "https://hebrew.example.com" },
+          { "id": "15", "title": "", "url": "https://empty-title.example.com" },
+          { "id": "16", "title": "Separator", "url": null },
+          { "id": "17", "title": "Long URL", "url": "https://example.com/path/to/very/long/resource?param1=value1&param2=value2&param3=value3&param4=value4&param5=value5&param6=value6&param7=value7&param8=value8&param9=value9&param10=value10#section1#section2#section3" },
+          { "id": "18", "title": "Special URL", "url": "https://example.com/path?query=a(b)c[d]e{f}g" },
+          { "id": "19", "title": "Emoji 🎉 Title 🚀", "url": "https://emoji.example.com" }
+        ]
+      }
+    ]
+  }
+]

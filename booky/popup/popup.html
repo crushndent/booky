@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title">Booky</h1>
+    </header>
+    
+    <div class="folder-section">
+      <div class="folder-label">Target Folder</div>
+      <div class="folder-display" id="folderDisplay">Not configured</div>
+    </div>
+    
+    <button class="btn btn-secondary" id="chooseFolderBtn">Choose Folder</button>
+    
+    <div class="folder-picker" id="folderPicker" hidden>
+      <div class="folder-picker-header">
+        <span>Select a folder</span>
+        <button class="close-btn" id="closePickerBtn">&times;</button>
+      </div>
+      <div class="folder-list" id="folderList">
+        <div class="folder-loading">Loading folders...</div>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <button class="btn btn-primary" id="exportBtn">Export to Drive</button>
+      <button class="btn btn-primary" id="importBtn">Import from Drive</button>
+    </div>
+    
+    <div class="status-section">
+      <div class="status-message" id="statusMessage" hidden></div>
+    </div>
+    
+    <div class="spinner-overlay" id="spinnerOverlay" hidden>
+      <div class="spinner"></div>
+      <div class="spinner-text" id="spinnerText">Processing...</div>
+    </div>
+  </div>
+</body>
+<script type="module" src="popup.js"></script>
+</html>

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "0",
+    "title": "",
+    "children": [
+      {
+        "id": "1",
+        "title": "Bookmarks Bar",
+        "children": [
+          { "id": "10", "title": "Google", "url": "https://www.google.com" },
+          { "id": "11", "title": "GitHub", "url": "https://github.com" }
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Other bookmarks",
+        "children": [
+          { "id": "20", "title": "Wikipedia", "url": "https://en.wikipedia.org" }
+        ]
+      }
+    ]
+  }
+]

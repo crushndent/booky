@@ -1,0 +1,107 @@
+[
+  {
+    "id": "0",
+    "title": "",
+    "children": [
+      {
+        "id": "1",
+        "title": "Bookmarks Bar",
+        "children": [
+          { "id": "10", "title": "Google", "url": "https://www.google.com" },
+          {
+            "id": "11",
+            "title": "Development",
+            "children": [
+              { "id": "110", "title": "[React] Docs", "url": "https://react.dev" },
+              { "id": "111", "title": "C++ (Advanced)", "url": "https://isocpp.org" },
+              {
+                "id": "112",
+                "title": "Frontend",
+                "children": [
+                  { "id": "1120", "title": "MDN Web Docs", "url": "https://developer.mozilla.org" },
+                  { "id": "1121", "title": "CSS Tricks", "url": "https://css-tricks.com" },
+                  {
+                    "id": "1122",
+                    "title": "Frameworks",
+                    "children": [
+                      { "id": "11220", "title": "Vue.js", "url": "https://vuejs.org" },
+                      { "id": "11221", "title": "Svelte", "url": "https://svelte.dev" }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "113",
+                "title": "Backend",
+                "children": [
+                  { "id": "1130", "title": "Node.js", "url": "https://nodejs.org" },
+                  { "id": "1131", "title": "Python.org", "url": "https://python.org" }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "12",
+            "title": "Empty Folder",
+            "children": []
+          },
+          {
+            "id": "13",
+            "title": "Folder With Only Subfolders",
+            "children": [
+              {
+                "id": "130",
+                "title": "Subfolder A",
+                "children": [
+                  { "id": "1300", "title": "Link A1", "url": "https://link-a1.com" }
+                ]
+              },
+              {
+                "id": "131",
+                "title": "Subfolder B",
+                "children": [
+                  { "id": "1310", "title": "Link B1", "url": "https://link-b1.com" }
+                ]
+              }
+            ]
+          },
+          { "id": "14", "title": "日本語", "url": "https://example.jp" }
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Other bookmarks",
+        "children": [
+          { "id": "20", "title": "Wikipedia", "url": "https://en.wikipedia.org" },
+          { "id": "21", "title": "YouTube", "url": "https://youtube.com" },
+          { "id": "22", "title": "Reddit", "url": "https://reddit.com" },
+          {
+            "id": "23",
+            "title": "News",
+            "children": [
+              { "id": "230", "title": "BBC", "url": "https://bbc.com" },
+              { "id": "231", "title": "CNN", "url": "https://cnn.com" },
+              { "id": "232", "title": "Reuters", "url": "https://reuters.com" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Mobile Bookmarks",
+        "children": [
+          { "id": "30", "title": "Maps", "url": "https://maps.google.com" },
+          { "id": "31", "title": "Weather", "url": "https://weather.com" },
+          {
+            "id": "32",
+            "title": "Shopping",
+            "children": [
+              { "id": "320", "title": "Amazon", "url": "https://amazon.com" },
+              { "id": "321", "title": "eBay", "url": "https://ebay.com" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
