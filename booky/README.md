@@ -4,8 +4,10 @@ A Chrome extension that syncs bookmarks bidirectionally between Chrome and a Mar
 
 ## Features
 
-- **Export**: Read all Chrome bookmarks, convert to Markdown, save to Google Drive
-- **Import**: Read a Markdown bookmarks file from Google Drive, parse it, and replace all Chrome bookmarks
+- **Export to Google Drive**: Read all Chrome bookmarks, convert to Markdown, save to Google Drive
+- **Import from Google Drive**: Read a Markdown bookmarks file from Google Drive, parse it, and replace all Chrome bookmarks
+- **Export to Local File**: Save bookmarks as Markdown file to your local computer
+- **Import from Local File**: Load bookmarks from a local Markdown file
 - **Minimal UI**: Popup with Export/Import buttons and a folder picker
 - **Secure**: Uses `drive.file` scope - only accesses files the extension creates
 
@@ -30,7 +32,8 @@ booky/
 │   ├── bookmarks-to-md.js # Convert bookmark tree → Markdown
 │   ├── md-to-bookmarks.js # Parse Markdown → bookmark tree
 │   ├── drive-api.js       # Google Drive API wrapper
-│   └── bookmark-api.js    # Chrome bookmarks API wrapper
+│   ├── bookmark-api.js    # Chrome bookmarks API wrapper
+│   └── file-system.js     # Local file system operations
 ├── icons/
 │   ├── icon16.png
 │   ├── icon48.png
@@ -75,15 +78,16 @@ The test suite includes:
 - **Phase 2**: API wrapper tests (mocked Chrome/Fetch APIs)
   - `drive-api.test.js` - 10 tests for Google Drive operations
   - `bookmark-api.test.js` - 7 tests for Chrome bookmark operations
+  - `file-system.test.js` - 12 tests for local file operations
 
 - **Phase 3**: Service worker tests (mocked everything)
-  - `service-worker.test.js` - 10 tests for message handling
+  - `service-worker.test.js` - 16 tests for message handling (including local file operations)
 
 ### Expected Output
 
 ```
-# tests 73
-# pass 73
+# tests 89
+# pass 89
 # fail 0
 ```
 
@@ -143,6 +147,9 @@ Edit `manifest.json` and replace `YOUR_CLIENT_ID` with your actual Google Cloud 
 4. Select a folder from your Drive
 5. Click **Export to Drive** to save your bookmarks
 6. Verify the `chrome-bookmarks.md` file appears in your Drive
+7. Try local file operations:
+   - Click **Export to Local File** to save bookmarks to your computer
+   - Click **Import from Local File** to load bookmarks from a Markdown file
 
 ### Production Deployment (Chrome Web Store)
 
@@ -281,6 +288,27 @@ The bookmark tree maps to Markdown as follows:
 | Bookmark | `- [title](url)` |
 | Depth > 5 | Capped at `######` (H6) |
 
+## Local File Operations
+
+In addition to Google Drive integration, Booky supports local file operations using the File System Access API:
+
+### Export to Local File
+- Click **Export to Local File** to save your bookmarks as a Markdown file locally
+- The browser's native file picker will open to choose a save location
+- Default filename: `chrome-bookmarks.md`
+- File format: Markdown (`.md` or `.txt`)
+
+### Import from Local File
+- Click **Import from Local File** to load bookmarks from a local Markdown file
+- The browser's native file picker will open to select a file
+- Supported formats: Markdown (`.md`, `.markdown`) or plain text (`.txt`)
+- **Warning**: This will replace all your Chrome bookmarks with the imported bookmarks
+
+### Browser Compatibility
+- Local file operations require Chrome 86+ or Edge 86+
+- Not supported in Firefox or Safari
+- The extension automatically detects browser support and disables buttons if not available
+
 ## Troubleshooting
 
 ### "Please sign in to Chrome with a Google account"
@@ -293,6 +321,11 @@ The bookmark tree maps to Markdown as follows:
 ### "No bookmarks file found in [folder name]"
 - The selected folder doesn't contain `chrome-bookmarks.md`
 - Export your bookmarks first to create the file
+
+### Local file operations not working
+- Local file operations require Chrome 86 or later
+- Ensure you're using a supported browser
+- The extension needs `file://*` host permission (already configured in manifest)
 
 ### OAuth errors
 - Verify your Google Cloud Client ID is correct in `manifest.json`

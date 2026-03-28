@@ -5,6 +5,8 @@ const folderList = document.getElementById('folderList');
 const closePickerBtn = document.getElementById('closePickerBtn');
 const exportBtn = document.getElementById('exportBtn');
 const importBtn = document.getElementById('importBtn');
+const exportLocalBtn = document.getElementById('exportLocalBtn');
+const importLocalBtn = document.getElementById('importLocalBtn');
 const statusMessage = document.getElementById('statusMessage');
 const spinnerOverlay = document.getElementById('spinnerOverlay');
 const spinnerText = document.getElementById('spinnerText');
@@ -34,12 +36,16 @@ function disableButtons() {
   chooseFolderBtn.disabled = true;
   exportBtn.disabled = true;
   importBtn.disabled = true;
+  exportLocalBtn.disabled = true;
+  importLocalBtn.disabled = true;
 }
 
 function enableButtons() {
   chooseFolderBtn.disabled = false;
   exportBtn.disabled = false;
   importBtn.disabled = false;
+  exportLocalBtn.disabled = false;
+  importLocalBtn.disabled = false;
 }
 
 function updateFolderDisplay(settings) {
@@ -136,7 +142,7 @@ async function handleExport() {
   }
   
   hideStatus();
-  showSpinner('Exporting bookmarks...');
+  showSpinner('Exporting bookmarks to Drive...');
   disableButtons();
   
   try {
@@ -146,7 +152,7 @@ async function handleExport() {
     enableButtons();
     
     if (response && response.success) {
-      showStatus('Bookmarks exported successfully');
+      showStatus('Bookmarks exported successfully to Drive');
     } else {
       showStatus(response?.error || 'Export failed', true);
     }
@@ -154,6 +160,55 @@ async function handleExport() {
     hideSpinner();
     enableButtons();
     showStatus('Export failed: ' + error.message, true);
+  }
+}
+
+async function handleExportLocal() {
+  hideStatus();
+  showSpinner('Exporting bookmarks to local file...');
+  disableButtons();
+  
+  try {
+    const response = await chrome.runtime.sendMessage({ action: 'exportLocal' });
+    
+    hideSpinner();
+    enableButtons();
+    
+    if (response && response.success) {
+      showStatus('Bookmarks exported successfully to local file');
+    } else {
+      showStatus(response?.error || 'Export failed: ' + (response?.error || 'Unknown error'), true);
+    }
+  } catch (error) {
+    hideSpinner();
+    enableButtons();
+    showStatus('Export failed: ' + error.message, true);
+  }
+}
+
+async function handleImportLocal() {
+  const confirmed = confirm('This will replace all your Chrome bookmarks with the content from the local file. Continue?');
+  if (!confirmed) return;
+  
+  hideStatus();
+  showSpinner('Importing bookmarks from local file...');
+  disableButtons();
+  
+  try {
+    const response = await chrome.runtime.sendMessage({ action: 'importLocal' });
+    
+    hideSpinner();
+    enableButtons();
+    
+    if (response && response.success) {
+      showStatus('Bookmarks imported successfully from local file');
+    } else {
+      showStatus(response?.error || 'Import failed', true);
+    }
+  } catch (error) {
+    hideSpinner();
+    enableButtons();
+    showStatus('Import failed: ' + error.message, true);
   }
 }
 
@@ -193,5 +248,22 @@ chooseFolderBtn.addEventListener('click', showFolderPicker);
 closePickerBtn.addEventListener('click', hideFolderPicker);
 exportBtn.addEventListener('click', handleExport);
 importBtn.addEventListener('click', handleImport);
+exportLocalBtn.addEventListener('click', handleExportLocal);
+importLocalBtn.addEventListener('click', handleImportLocal);
 
-document.addEventListener('DOMContentLoaded', loadSettings);
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadSettings();
+  
+  // Check if local file access is supported
+  try {
+    const response = await chrome.runtime.sendMessage({ action: 'checkLocalFileSupport' });
+    if (response && response.success && !response.supported) {
+      exportLocalBtn.disabled = true;
+      importLocalBtn.disabled = true;
+      exportLocalBtn.title = 'Local file access not supported in this browser';
+      importLocalBtn.title = 'Local file access not supported in this browser';
+    }
+  } catch (error) {
+    // Silently fail - buttons will still work if API is available
+  }
+});

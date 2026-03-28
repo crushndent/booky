@@ -28,7 +28,10 @@ function createMockServiceWorkerDeps() {
     messages: [],
     shouldFailAuth: false,
     shouldFailDrive: false,
-    shouldFailFindFile: false
+    shouldFailFindFile: false,
+    shouldFailLocalExport: false,
+    shouldFailLocalImport: false,
+    localFileContent: null
   };
   
   const mockBookmarkApi = {
@@ -70,20 +73,35 @@ function createMockServiceWorkerDeps() {
     bookmarkTreeToMarkdown: (tree) => '# Bookmarks\n- [Link](https://example.com)'
   };
   
-  const mockMdToBookmarks = {
+const mockMdToBookmarks = {
     markdownToBookmarkTree: (md) => {
       if (state.shouldFailParse) throw new Error('Parse error');
       return [{ title: 'Imported', children: [] }];
     }
   };
-  
+
+  const mockFileSystem = {
+    exportToLocalFile: async (content) => {
+      if (state.shouldFailLocalExport) throw new Error('Local export failed');
+      state.localFileContent = content;
+      return { success: true };
+    },
+    importFromLocalFile: async () => {
+      if (state.shouldFailLocalImport) throw new Error('Local import failed');
+      if (state.localFileContent === null) throw new Error('No file selected');
+      return { success: true, content: state.localFileContent };
+    },
+    isLocalFileAccessSupported: () => true
+  };
+
   return {
     state,
     mocks: {
       bookmarkApi: mockBookmarkApi,
       driveApi: mockDriveApi,
       bookmarksToMd: mockBookmarksToMd,
-      mdToBookmarks: mockMdToBookmarks
+      mdToBookmarks: mockMdToBookmarks,
+      fileSystem: mockFileSystem
     }
   };
 }
@@ -133,6 +151,18 @@ async function createHandler(state, mocks) {
     }
   }
 
+  async function handleExportLocal() {
+    try {
+      const tree = await mocks.bookmarkApi.getFullTree();
+      const markdown = mocks.bookmarksToMd.bookmarkTreeToMarkdown(tree);
+      
+      const result = await mocks.fileSystem.exportToLocalFile(markdown);
+      return result;
+    } catch (error) {
+      return { success: false, error: error.message || 'Local export failed' };
+    }
+  }
+
   async function handleImport() {
     try {
       const settings = await getSettings();
@@ -169,6 +199,29 @@ async function createHandler(state, mocks) {
     }
   }
 
+  async function handleImportLocal() {
+    try {
+      const result = await mocks.fileSystem.importFromLocalFile();
+      
+      if (!result.success) {
+        return result;
+      }
+
+      let tree;
+      try {
+        tree = mocks.mdToBookmarks.markdownToBookmarkTree(result.content);
+      } catch (parseError) {
+        return { success: false, error: `Parse error: ${parseError.message}` };
+      }
+
+      await mocks.bookmarkApi.replaceAllBookmarks(tree);
+      
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message || 'Local import failed' };
+    }
+  }
+
   async function handleListFolders() {
     try {
       const token = await mocks.driveApi.getAuthToken();
@@ -183,12 +236,19 @@ async function createHandler(state, mocks) {
     }
   }
 
+  async function checkLocalFileSupport() {
+    return { success: true, supported: mocks.fileSystem.isLocalFileAccessSupported() };
+  }
+
   return {
     getSettings,
     saveSettings,
     handleExport,
+    handleExportLocal,
     handleImport,
-    handleListFolders
+    handleImportLocal,
+    handleListFolders,
+    checkLocalFileSupport
   };
 }
 
@@ -305,4 +365,68 @@ test('saveSettings', async () => {
   assert.equal(state.storedSettings.driveFolderId, 'newFolder456');
   assert.equal(state.storedSettings.driveFolderName, 'New Folder');
   assert.equal(state.storedSettings.bookmarksFilename, 'custom-bookmarks.md');
+});
+
+test('Export local success', async () => {
+  const { state, mocks } = createMockServiceWorkerDeps();
+  const handlers = await createHandler(state, mocks);
+  
+  const result = await handlers.handleExportLocal();
+  
+  assert.equal(result.success, true);
+  assert.equal(state.localFileContent, '# Bookmarks\n- [Link](https://example.com)');
+});
+
+test('Export local failure', async () => {
+  const { state, mocks } = createMockServiceWorkerDeps();
+  state.shouldFailLocalExport = true;
+  const handlers = await createHandler(state, mocks);
+  
+  const result = await handlers.handleExportLocal();
+  
+  assert.equal(result.success, false);
+  assert.ok(result.error.includes('Local export failed'));
+});
+
+test('Import local success', async () => {
+  const { state, mocks } = createMockServiceWorkerDeps();
+  state.localFileContent = '# Bookmarks\n- [Link](https://example.com)';
+  const handlers = await createHandler(state, mocks);
+  
+  const result = await handlers.handleImportLocal();
+  
+  assert.equal(result.success, true);
+});
+
+test('Import local failure - file system error', async () => {
+  const { state, mocks } = createMockServiceWorkerDeps();
+  state.shouldFailLocalImport = true;
+  const handlers = await createHandler(state, mocks);
+  
+  const result = await handlers.handleImportLocal();
+  
+  assert.equal(result.success, false);
+  assert.ok(result.error.includes('Local import failed'));
+});
+
+test('Import local failure - parse error', async () => {
+  const { state, mocks } = createMockServiceWorkerDeps();
+  state.localFileContent = '# Bookmarks\n- [Link](https://example.com)';
+  state.shouldFailParse = true;
+  const handlers = await createHandler(state, mocks);
+  
+  const result = await handlers.handleImportLocal();
+  
+  assert.equal(result.success, false);
+  assert.ok(result.error.includes('Parse error'));
+});
+
+test('Check local file support', async () => {
+  const { state, mocks } = createMockServiceWorkerDeps();
+  const handlers = await createHandler(state, mocks);
+  
+  const result = await handlers.checkLocalFileSupport();
+  
+  assert.equal(result.success, true);
+  assert.equal(result.supported, true);
 });
